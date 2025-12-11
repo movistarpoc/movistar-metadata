@@ -1,2 +1,5 @@
-variable "np_api_key" {}
 variable "nrn" {}
+variable "nrn_namespace_platform_engineering" {}
+variable "nrn_namespace_playground" {}
+
+variable "account_level_np_api_key" {}

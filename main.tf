@@ -19,7 +19,7 @@ resource "nullplatform_notification_channel" "entity-hooks" {
 
   configuration {
     agent {
-      api_key = var.np_api_key
+      api_key = var.account_level_np_api_key
       command {
         data = {
           cmdline = "/root/.np/movistarpoc/movistar-metadata/replace_gitlab_values.sh"
@@ -40,7 +40,7 @@ resource "nullplatform_metadata_specification" "metadata_application_playground"
   description = "Add metadata to application"
 
   #NRN del namespace Playground 
-  nrn         = "organization=1320616147:account=1932788072:namespace=189729792"
+  nrn         = var.nrn_namespace_playground
   entity      = "application"
   metadata    = "metadata_application_playground"
 
@@ -97,7 +97,7 @@ resource "nullplatform_metadata_specification" "metadata_application_platform_en
   description = "Add metadata to application"
 
   #NRN del namespace Platform Engineering
-  nrn         = "organization=1320616147:account=1932788072:namespace=432147515"
+  nrn         = var.nrn_namespace_platform_engineering
   entity      = "application"
   metadata    = "metadata_application_platform_engineering"
 
