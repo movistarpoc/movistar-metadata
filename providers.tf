@@ -8,5 +8,5 @@ terraform {
 }
 
 provider "nullplatform" {
-  api_key = var.np_api_key
+  api_key = var.account_level_np_api_key
 }
