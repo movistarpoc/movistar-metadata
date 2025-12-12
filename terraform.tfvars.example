@@ -1,4 +1,9 @@
-nrn           = "organization=1320616147:account=1932788072"
+nrn = "organization=1320616147:account=1932788072"
+nrn_namespace_platform_engineering = "organization=1320616147:account=1932788072:namespace=432147515"
+nrn_namespace_playground = "organization=1320616147:account=1932788072:namespace=189729792"
 
 #API KEY Entity Hook Account level - all permissions
 np_api_key    = "<APIKEY-ACCOUNT-LEVEL>"
+
+
+
