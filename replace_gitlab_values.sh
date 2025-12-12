@@ -85,7 +85,7 @@ clone_repository() {
 
     if [ -n "$GITLAB_TOKEN_ENTITY" ]; then
         echo "Using GITLAB_TOKEN_ENTITY for authentication"
-        local auth_url=$(echo "$REPO_URL" | sed "s|https://github.com|https://${GITLAB_TOKEN_ENTITY}@github.com|")
+        local auth_url=$(echo "$REPO_URL" | sed "s|https://gitlab-ee.agil.movistar.com.ar|https://git:${GITLAB_TOKEN_ENTITY}@gitlab-ee.agil.movistar.com.ar|")
         git clone "$auth_url"
     else
         echo "WARNING: No GITLAB_TOKEN_ENTITY found, attempting clone without authentication"
@@ -147,8 +147,8 @@ modify_ci_file() {
 commit_and_push() {
     log_section "Committing and Pushing Changes"
 
-    git config user.email "agustin@nullplatform.io"
-    git config user.name "Agustin"
+    git config user.email "movistar@nullplatform.io"
+    git config user.name "Movistar"
 
     git add .github/workflows/ci.yml
 
