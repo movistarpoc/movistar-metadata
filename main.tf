@@ -22,7 +22,7 @@ resource "nullplatform_notification_channel" "entity-hooks" {
       api_key = var.account_level_np_api_key
       command {
         data = {
-          cmdline = "/.np/movistarpoc/movistar-metadata/replace_gitlab_values.sh"
+          cmdline = "/.np/movistarpoc/movistar-metadata/entity_hook_entrypoint.sh"
           environment = jsonencode({
             NP_ACTION_CONTEXT = "'$${NOTIFICATION_CONTEXT}'"
           })
