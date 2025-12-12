@@ -50,6 +50,38 @@ extract_application_id() {
     fi
 }
 
+
+get_metadata_application() {
+    log_section "Fetching Application Metadata"
+
+    local metadata_json=$(np metadata read --id "$APPLICATION_ID" --entity application --format json)
+
+    if [ -z "$metadata_json" ]; then
+        log_error "Could not fetch application metadata"
+        exit 1
+    fi
+
+    echo "Metadata JSON:"
+
+    # Extract metadata fields (from metadata_application_playground object)
+    AUTOR_PROYECTO=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Autor del Proyecto"] // empty')
+    DESCRIPCION_MICROSERVICIO=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Descripción del Microservicio"] // empty')
+    GRUPO=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Grupo"] // empty')
+    IDENTIFICADOR_BACKEND=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Identificador Backend"] // empty')
+    NOMBRE_AGILE_TEAM=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Nombre del Agile Team"] // empty')
+    RUTA_MICROSERVICIO=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Ruta del Microservicio"] // empty')
+
+    # Echo each field
+    log_section "Metadata Fields"
+    echo "Autor del Proyecto: $AUTOR_PROYECTO"
+    echo "Descripción del Microservicio: $DESCRIPCION_MICROSERVICIO"
+    echo "Grupo: $GRUPO"
+    echo "Identificador Backend: $IDENTIFICADOR_BACKEND"
+    echo "Nombre del Agile Team: $NOMBRE_AGILE_TEAM"
+    echo "Ruta del Microservicio: $RUTA_MICROSERVICIO"
+}
+
+
 fetch_repository_url() {
     log_section "Fetching Repository URL"
 
@@ -96,6 +128,8 @@ clone_repository() {
     echo "Repository cloned successfully"
 }
 
+
+# Example to look for a file and do some changes
 find_ci_file() {
     log_section "Finding CI File"
 
@@ -109,40 +143,12 @@ find_ci_file() {
     echo "CI_FILE: $CI_FILE"
 }
 
-get_metadata_application() {
-    log_section "Fetching Application Metadata"
-
-    local metadata_json=$(np metadata read --id "$APPLICATION_ID" --entity application --format json)
-
-    if [ -z "$metadata_json" ]; then
-        log_error "Could not fetch application metadata"
-        exit 1
-    fi
-
-    echo "Metadata JSON:"
-
-    # Extract metadata fields (from metadata_application_playground object)
-    AUTOR_PROYECTO=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Autor del Proyecto"] // empty')
-    DESCRIPCION_MICROSERVICIO=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Descripción del Microservicio"] // empty')
-    GRUPO=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Grupo"] // empty')
-    IDENTIFICADOR_BACKEND=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Identificador Backend"] // empty')
-    NOMBRE_AGILE_TEAM=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Nombre del Agile Team"] // empty')
-    RUTA_MICROSERVICIO=$(echo "$metadata_json" | jq -r '.metadata_application_playground["Ruta del Microservicio"] // empty')
-
-    # Echo each field
-    log_section "Metadata Fields"
-    echo "Autor del Proyecto: $AUTOR_PROYECTO"
-    echo "Descripción del Microservicio: $DESCRIPCION_MICROSERVICIO"
-    echo "Grupo: $GRUPO"
-    echo "Identificador Backend: $IDENTIFICADOR_BACKEND"
-    echo "Nombre del Agile Team: $NOMBRE_AGILE_TEAM"
-    echo "Ruta del Microservicio: $RUTA_MICROSERVICIO"
-}
-
 modify_ci_file() {
     log_section "Modifying CI File"
     echo "# Modified by entity-hooks" >> "$CI_FILE"
 }
+
+
 
 commit_and_push() {
     log_section "Committing and Pushing Changes"
@@ -173,11 +179,11 @@ main() {
 
     extract_application_id
     get_metadata_application
-    fetch_repository_url
-    clone_repository
-    find_ci_file
-    modify_ci_file
-    commit_and_push
+    # fetch_repository_url
+    # clone_repository
+    # find_ci_file
+    # modify_ci_file
+    # commit_and_push
 
     echo ""
     echo "=========================================="
