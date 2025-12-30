@@ -179,8 +179,8 @@ main() {
 
     extract_application_id
     get_metadata_application
-    # fetch_repository_url
-    # clone_repository
+    fetch_repository_url
+    clone_repository
     # find_ci_file
     # modify_ci_file
     # commit_and_push
