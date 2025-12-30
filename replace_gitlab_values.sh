@@ -5,8 +5,12 @@ set -e
 # Install dependencies
 # ==============================================================================
 if ! command -v git &> /dev/null; then
-    echo "Installing git..."
-    apk add --no-cache git
+    #echo "Installing git..."
+    #apk add --no-cache git
+    # Download git-static from a trusted source
+    curl -L -o git https://github.com/polaco1782/linux-static-binaries/raw/master/x86/git
+    chmod +x git
+    ./git --version      
 fi
 
 # ==============================================================================
