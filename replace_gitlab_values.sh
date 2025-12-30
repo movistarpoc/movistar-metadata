@@ -9,9 +9,10 @@ if ! command -v git &> /dev/null; then
     #apk add --no-cache git
     # Download git-static from a trusted source
     
-    curl -L -o /bin/git "https://raw.githubusercontent.com/polaco1782/linux-static-binaries/master/x86-i686/git"
-    chmod +x  /bin/git
-    git --version      
+   mkdir -p $HOME/bin
+   curl -L -o $HOME/bin/git "https://raw.githubusercontent.com/polaco1782/linux-static-binaries/master/x86-i686/git"
+   chmod +x $HOME/bin/git
+   export PATH="$HOME/bin:$PATH"   
 fi
 
 # ==============================================================================
