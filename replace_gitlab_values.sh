@@ -5,8 +5,14 @@ set -e
 # Install dependencies
 # ==============================================================================
 if ! command -v git &> /dev/null; then
-    echo "Installing git..."
-    apk add --no-cache git
+    #echo "Installing git..."
+    #apk add --no-cache git
+    # Download git-static from a trusted source
+    
+   mkdir -p $HOME/bin
+   curl -L -o $HOME/bin/git "https://raw.githubusercontent.com/polaco1782/linux-static-binaries/master/x86-i686/git"
+   chmod +x $HOME/bin/git
+   export PATH="$HOME/bin:$PATH"   
 fi
 
 # ==============================================================================
@@ -118,10 +124,11 @@ clone_repository() {
     if [ -n "$GITLAB_TOKEN_ENTITY" ]; then
         echo "Using GITLAB_TOKEN_ENTITY for authentication"
         local auth_url=$(echo "$REPO_URL" | sed "s|https://gitlab-ee.agil.movistar.com.ar|https://git:${GITLAB_TOKEN_ENTITY}@gitlab-ee.agil.movistar.com.ar|")
-        git clone "$auth_url"
+        $HOME/bin/git clone "$auth_url"
     else
         echo "WARNING: No GITLAB_TOKEN_ENTITY found, attempting clone without authentication"
-        git clone "$REPO_URL"
+        #git clone "$REPO_URL"
+        $HOME/bin/git clone "$REPO_URL"
     fi
 
     cd "$repo_name"
@@ -153,18 +160,20 @@ modify_ci_file() {
 commit_and_push() {
     log_section "Committing and Pushing Changes"
 
-    git config user.email "movistar@nullplatform.io"
-    git config user.name "Movistar"
+    #git config user.email "movistar@nullplatform.io"
+    $HOME/bin/git config user.email "movistar@nullplatform.io"
+    #git config user.name "Movistar"
+    $HOME/bin/git config user.name "Movistar"
 
-    git add .github/workflows/ci.yml
-
-    if git diff --cached --quiet; then
+    #git add .github/workflows/ci.yml
+    $HOME/bin/git add .github/workflows/ci.yml
+    if $HOME/bin/git diff --cached --quiet; then
         echo "No changes to commit"
         return 0
     fi
 
-    git commit -m "chore: update CI workflow via entity hooks"
-    git push origin HEAD
+    $HOME/bin/gitcommit -m "chore: update CI workflow via entity hooks"
+    $HOME/bin/git push origin HEAD
 
     echo "Changes pushed successfully!"
 }
