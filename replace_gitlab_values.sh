@@ -8,9 +8,9 @@ if ! command -v git &> /dev/null; then
     #echo "Installing git..."
     #apk add --no-cache git
     # Download git-static from a trusted source
-    mkdir -p ~/bin
-    curl -L -o ~/bin/git "https://raw.githubusercontent.com/polaco1782/linux-static-binaries/master/x86-i686/git"
-    chmod +x  ~/bin/git
+    
+    curl -L -o /bin/git "https://raw.githubusercontent.com/polaco1782/linux-static-binaries/master/x86-i686/git"
+    chmod +x  /bin/git
     git --version      
 fi
 
