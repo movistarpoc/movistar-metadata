@@ -213,6 +213,15 @@ modify_ci_file() {
         fi
     fi
 
+    echo "Reemplazos:"
+    echo "rp_var_microservice_name -> $MICROSERVICE_NAME"
+    echo "rp_var_author -> $AUTOR_PROYECTO"
+    echo "rp_var_agile_team -> $NOMBRE_AGILE_TEAM"
+    echo "rp_var_project_description -> $DESCRIPCION_MICROSERVICIO"
+    echo "rp_var_route -> $RUTA_MICROSERVICIO"
+    echo "rp_var_backend -> $IDENTIFICADOR_BACKEND"
+    echo "Archivos a modificar: ${#TARGET_FILES[@]}"
+
     local esc_microservice_name
     local esc_author
     local esc_team
