@@ -16,6 +16,8 @@ fi
 # ==============================================================================
 SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
 CI_FILE=""
+TARGET_FILES=()
+MICROSERVICE_NAME=""
 
 # ==============================================================================
 # Utility functions
@@ -29,6 +31,20 @@ log_error() {
     echo "ERROR: $1"
 }
 
+# Funciones para editar y modificar la metadata
+require_var() {
+    local name="$1"
+    local value="${!name}"
+
+    if [ -z "$value" ]; then
+        log_error "Missing required value for $name"
+        exit 1
+    fi
+}
+
+escape_sed_replacement() {
+    printf '%s' "$1" | sed -e 's/[&|\\]/\\&/g'
+}
 # ==============================================================================
 # Core functions
 # ==============================================================================
@@ -133,22 +149,103 @@ clone_repository() {
 
 
 # Example to look for a file and do some changes
+
+#find_ci_file() {
+#    log_section "Finding CI File"
+#
+#    CI_FILE=".github/workflows/ci.yml"
+#
+#    if [ ! -f "$CI_FILE" ]; then
+#        log_error "No CI file found at .github/workflows/ci.yml"
+#        exit 1
+#    fi
+#
+#    echo "CI_FILE: $CI_FILE"
+#}
+
+# Función que nos permite encontrar dentro del archivo las variables a modificar.
 find_ci_file() {
-    log_section "Finding CI File"
+    log_section "Finding files with template variables"
 
-    CI_FILE=".github/workflows/ci.yml"
+    TARGET_FILES=()
 
-    if [ ! -f "$CI_FILE" ]; then
-        log_error "No CI file found at .github/workflows/ci.yml"
+    while IFS= read -r -d '' file; do
+        if grep -q "rp_var_" "$file"; then
+            TARGET_FILES+=("$file")
+        fi
+    done < <(find . -type f \
+        ! -path "./.git/*" \
+        ! -path "./node_modules/*" \
+        ! -path "./dist/*" \
+        ! -path "./coverage/*" \
+        -print0)
+
+    if [ "${#TARGET_FILES[@]}" -eq 0 ]; then
+        log_error "No files with rp_var_ placeholders found"
         exit 1
     fi
 
-    echo "CI_FILE: $CI_FILE"
+    echo "Files to update:"
+    printf ' - %s\n' "${TARGET_FILES[@]}"
 }
 
+#modify_ci_file() {
+#    log_section "Modifying CI File"
+#    echo "# Modified by entity-hooks" >> "$CI_FILE"
+#}
+
+# Función para modificar variables en el template
 modify_ci_file() {
-    log_section "Modifying CI File"
-    echo "# Modified by entity-hooks" >> "$CI_FILE"
+    log_section "Replacing template variables"
+
+    require_var AUTOR_PROYECTO
+    require_var DESCRIPCION_MICROSERVICIO
+    require_var NOMBRE_AGILE_TEAM
+    require_var RUTA_MICROSERVICIO
+    require_var IDENTIFICADOR_BACKEND
+
+    if [ -z "$MICROSERVICE_NAME" ]; then
+        local prefix="${MICROSERVICE_NAME_PREFIX:-pcrm-fcd}"
+        if [[ "$IDENTIFICADOR_BACKEND" == "${prefix}-"* ]]; then
+            MICROSERVICE_NAME="$IDENTIFICADOR_BACKEND"
+        else
+            MICROSERVICE_NAME="${prefix}-${IDENTIFICADOR_BACKEND}"
+        fi
+    fi
+
+    echo "Reemplazos:"
+    echo "rp_var_microservice_name -> $MICROSERVICE_NAME"
+    echo "rp_var_author -> $AUTOR_PROYECTO"
+    echo "rp_var_agile_team -> $NOMBRE_AGILE_TEAM"
+    echo "rp_var_project_description -> $DESCRIPCION_MICROSERVICIO"
+    echo "rp_var_route -> $RUTA_MICROSERVICIO"
+    echo "rp_var_backend -> $IDENTIFICADOR_BACKEND"
+    echo "Archivos a modificar: ${#TARGET_FILES[@]}"
+
+    local esc_microservice_name
+    local esc_author
+    local esc_team
+    local esc_description
+    local esc_route
+    local esc_backend
+
+    esc_microservice_name=$(escape_sed_replacement "$MICROSERVICE_NAME")
+    esc_author=$(escape_sed_replacement "$AUTOR_PROYECTO")
+    esc_team=$(escape_sed_replacement "$NOMBRE_AGILE_TEAM")
+    esc_description=$(escape_sed_replacement "$DESCRIPCION_MICROSERVICIO")
+    esc_route=$(escape_sed_replacement "$RUTA_MICROSERVICIO")
+    esc_backend=$(escape_sed_replacement "$IDENTIFICADOR_BACKEND")
+
+    for file in "${TARGET_FILES[@]}"; do
+        sed -i \
+            -e "s|rp_var_microservice_name|$esc_microservice_name|g" \
+            -e "s|rp_var_author|$esc_author|g" \
+            -e "s|rp_var_agile_team|$esc_team|g" \
+            -e "s|rp_var_project_description|$esc_description|g" \
+            -e "s|rp_var_route|$esc_route|g" \
+            -e "s|rp_var_backend|$esc_backend|g" \
+            "$file"
+    done
 }
 
 
@@ -161,7 +258,8 @@ commit_and_push() {
     git config user.name "Movistar"
   
 
-    git add .github/workflows/ci.yml
+#    git add .github/workflows/ci.yml
+    git add "${TARGET_FILES[@]}"
   
     if  git diff --cached --quiet; then
         echo "No changes to commit"
@@ -186,8 +284,8 @@ main() {
     get_metadata_application
     fetch_repository_url
     clone_repository
-    # find_ci_file
-    # modify_ci_file
+    find_ci_file
+    modify_ci_file
     # commit_and_push
 
     echo ""
