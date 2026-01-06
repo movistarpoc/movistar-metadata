@@ -253,9 +253,10 @@ modify_ci_file() {
 commit_and_push() {
     log_section "Committing and Pushing Changes"
 
-    git config user.email "movistar@nullplatform.io"
-   
-    git config user.name "Movistar"
+    #git config user.email "movistar@nullplatform.io"
+    git config user.email "automatpipeline@tmoviles.com.ar"
+    #git config user.name "Movistar"
+    git config user.name "AUTOMATPIPELINE"
   
 
 #    git add .github/workflows/ci.yml
