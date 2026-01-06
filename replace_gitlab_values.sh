@@ -286,7 +286,7 @@ main() {
     clone_repository
     find_ci_file
     modify_ci_file
-    # commit_and_push
+    commit_and_push
 
     echo ""
     echo "=========================================="
